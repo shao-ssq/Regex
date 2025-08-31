@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/tooltip'
 import { NavLink } from "react-router-dom"
 
-export type Tab = 'legend' | 'edit' | 'test'
+export type Tab = 'legend' | 'edit' | 'test' | 'samples'
 type Props = {
   defaultTab: Tab
   collapsed: boolean
@@ -82,11 +82,13 @@ function Editor({ defaultTab, collapsed }: Props) {
     }
   })
 
+  const renderWidth = tabValue === 'samples'?  'w-1/2' : 'w-[305px]';
+
   return (
     <Tabs
       value={tabValue}
       onValueChange={(value: string) => setTabValue(value as Tab)}
-      className={clsx('flex flex-col h-[calc(100vh-64px)] py-4 border-l transition-width', collapsed ? 'w-[0px]' : 'w-[305px]')}
+      className={clsx('flex flex-col h-[calc(100vh-64px)] py-4 border-l transition-width', collapsed ? 'w-[0px]' : renderWidth)}
     >
       <TooltipProvider delayDuration={500}>
         <Tooltip>
@@ -114,7 +116,7 @@ function Editor({ defaultTab, collapsed }: Props) {
             </TabsTrigger>
           </TabsList>
           <ScrollArea className="flex-1">
-            <div className="w-[305px] p-4 pt-0">
+            <div className="w-auto p-4 pt-0">
               <TabsContent value="edit">
                 <EditTab />
               </TabsContent>
