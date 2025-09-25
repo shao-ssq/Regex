@@ -44,8 +44,8 @@ function Home() {
   const [graphTipVisible, setGraphTipVisible] = useLocalStorage<boolean>(STORAGE_GRAPH_TIP_VISIBLE, true)
   const shouldGenAst = useRef(true)
   const shouldParseRegex = useRef(true)
-
-  const [editorDefaultTab, setEditorDefaultTab] = useState<Tab>('legend')
+  // 修改首页
+  const [editorDefaultTab, setEditorDefaultTab] = useState<Tab>('agent')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
   const [regex, setRegex, regexRef] = useCurrentState<string>(
     () => searchParams.get(SEARCH_PARAM_REGEX) || '',

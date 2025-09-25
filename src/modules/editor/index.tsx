@@ -8,6 +8,7 @@ import EditTab from './edit-tab'
 import LegendTab from './legend-tab'
 import TestTab from './test-tab'
 import SamplesTab from './../samples/index'
+import AgentTab from './../agents/index'
 import { useCurrentState } from '@/utils/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
@@ -25,7 +26,7 @@ import {
 } from '@/components/ui/tooltip'
 import { NavLink } from "react-router-dom"
 
-export type Tab = 'legend' | 'edit' | 'test' | 'samples'
+export type Tab = 'legend' | 'edit' | 'test' | 'samples' | 'agent'
 type Props = {
   defaultTab: Tab
   collapsed: boolean
@@ -82,7 +83,13 @@ function Editor({ defaultTab, collapsed }: Props) {
     }
   })
 
-  const renderWidth = tabValue === 'samples'?  'w-1/2' : 'w-[305px]';
+  const renderWidth =
+    tabValue === 'samples'
+      ? 'w-1/2'
+      : tabValue === 'agent'
+        ? 'w-1/3'
+        : 'w-[305px]';
+
 
   return (
     <Tabs
@@ -92,7 +99,15 @@ function Editor({ defaultTab, collapsed }: Props) {
     >
       <TooltipProvider delayDuration={500}>
         <Tooltip>
-          <TabsList className="grid grid-cols-4 mx-4 mb-6">
+          <TabsList className="grid grid-cols-5 mx-4 mb-6">
+            <TabsTrigger value="agent">
+              {t('Agent')}
+            </TabsTrigger>
+            <TabsTrigger value="samples">
+              {t('Samples')}
+            </TabsTrigger>
+            <TabsTrigger value="legend">{t('Legends')}</TabsTrigger>
+            <TabsTrigger value="test">{t('Test')}</TabsTrigger>
             <TabsTrigger
               value="edit"
               disabled={editDisabled}
@@ -109,14 +124,12 @@ function Editor({ defaultTab, collapsed }: Props) {
                   )
                 : t('Edit')}
             </TabsTrigger>
-            <TabsTrigger value="test">{t('Test')}</TabsTrigger>
-            <TabsTrigger value="legend">{t('Legends')}</TabsTrigger>
-            <TabsTrigger value="samples">
-              {t('Samples')}
-            </TabsTrigger>
           </TabsList>
           <ScrollArea className="flex-1">
             <div className="w-auto p-4 pt-0">
+              <TabsContent value="agent">
+                <AgentTab />
+              </TabsContent>
               <TabsContent value="edit">
                 <EditTab />
               </TabsContent>
