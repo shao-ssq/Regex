@@ -49,7 +49,7 @@ export default function AgentChat() {
 
     try {
       const response = await fetch(
-        "http://127.0.0.1:5000/tools/regex_generate",
+        "http://172.21.3.56:5000/tools/regex_generate",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
