@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAtomValue, useSetAtom } from "jotai"
 import { useUpdateEffect } from "react-use"
@@ -24,25 +24,23 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from "@/components/ui/tooltip"
-import { NavLink } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 export type Tab = "legend" | "edit" | "test" | "samples" | "agent"
 type Props = {
   defaultTab: Tab
-  collapsed: boolean
+  collapsed?: boolean
 }
 
-function navLinkClassName({ isActive }: { isActive: boolean }) {
-  return clsx("transition-colors hover:text-foreground/80 text-sm", isActive ? "text-foreground" : "text-foreground/60")
-}
-
-function Editor({ defaultTab, collapsed }: Props) {
+function Editor({ defaultTab, collapsed: initialCollapsed = false }: Props) {
   const selectedIds = useAtomValue(selectedIdsAtom)
   const remove = useSetAtom(removeAtom)
   const undo = useSetAtom(undoAtom)
   const redo = useSetAtom(redoAtom)
 
   const [tabValue, setTabValue, tabValueRef] = useCurrentState<Tab>(defaultTab)
+  const [collapsed, setCollapsed] = useState(initialCollapsed)
 
   const { t } = useTranslation()
 
@@ -85,70 +83,78 @@ function Editor({ defaultTab, collapsed }: Props) {
 
   const renderWidth =
     tabValue === "samples"
-      ? "w-1/2"
+      ? "w-full"
       : "w-[305px]"
 
-
   return (
-    <Tabs
-      value={tabValue}
-      onValueChange={(value: string) => setTabValue(value as Tab)}
-      className={clsx("flex flex-col h-[calc(100vh-64px)] py-4 border-l transition-width", collapsed ? "w-[0px]" : renderWidth)}
-      style={{ height: "100%" }}
-    >
-      <TooltipProvider delayDuration={500}>
-        <Tooltip>
-          <TabsList className="grid grid-cols-5 mx-4 mb-6">
-            <TabsTrigger value="agent">
-              {t("Agent")}
-            </TabsTrigger>
-            <TabsTrigger value="legend">{t("Legends")}</TabsTrigger>
-            <TabsTrigger value="test">{t("Test")}</TabsTrigger>
-            <TabsTrigger
-              value="edit"
-              disabled={editDisabled}
-              asChild={editDisabled}
-              className={
-                clsx({ "cursor-not-allowed": editDisabled }, "!pointer-events-auto")
-              }
-            >
-              {editDisabled
-                ? (
-                  <TooltipTrigger>
-                    {t("Edit")}
-                  </TooltipTrigger>
-                )
-                : t("Edit")}
-            </TabsTrigger>
-            <TabsTrigger value="samples">
-              {t("Samples")}
-            </TabsTrigger>
-          </TabsList>
-          <ScrollArea className="flex-1">
-            <div className="w-auto p-4 pt-0">
-              <TabsContent value="agent">
-                <AgentTab />
-              </TabsContent>
-              <TabsContent value="edit">
-                <EditTab />
-              </TabsContent>
-              <TabsContent value="test">
-                <TestTab />
-              </TabsContent>
-              <TabsContent value="legend">
-                <LegendTab />
-              </TabsContent>
-              <TabsContent value="samples">
-                <SamplesTab />
-              </TabsContent>
-            </div>
-          </ScrollArea>
-          <TooltipContent>
-            <p>{t("You have to select nodes first")}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </Tabs>
+    <div className="flex flex-col relative h border-l py-4 transition-width">
+      {/* 展开/收缩按钮 */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setCollapsed(!collapsed)}
+        className="absolute -left-10 top-4 rounded-full shadow"
+      >
+        {collapsed ? <ChevronLeft /> : <ChevronRight />}
+      </Button>
+
+      <Tabs
+        value={tabValue}
+        onValueChange={(value: string) => setTabValue(value as Tab)}
+        className={clsx(
+          "flex flex-col h-full py-4 transition-all duration-300",
+          collapsed ? "w-0 overflow-hidden" : renderWidth
+        )}
+      >
+        <TooltipProvider delayDuration={500}>
+          <Tooltip>
+            <TabsList className="grid grid-cols-5 mx-4 mb-6">
+              <TabsTrigger value="agent">{t("Agent")}</TabsTrigger>
+              <TabsTrigger value="legend">{t("Legends")}</TabsTrigger>
+              <TabsTrigger value="test">{t("Test")}</TabsTrigger>
+              <TabsTrigger
+                value="edit"
+                disabled={editDisabled}
+                asChild={editDisabled}
+                className={clsx(
+                  { "cursor-not-allowed": editDisabled },
+                  "!pointer-events-auto"
+                )}
+              >
+                {editDisabled ? (
+                  <TooltipTrigger>{t("Edit")}</TooltipTrigger>
+                ) : (
+                  t("Edit")
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="samples">{t("Samples")}</TabsTrigger>
+            </TabsList>
+            <ScrollArea className="flex-1">
+              <div className="w-auto p-4 pt-0">
+                <TabsContent value="agent">
+                  <AgentTab />
+                </TabsContent>
+                <TabsContent value="edit">
+                  <EditTab />
+                </TabsContent>
+                <TabsContent value="test">
+                  <TestTab />
+                </TabsContent>
+                <TabsContent value="legend">
+                  <LegendTab />
+                </TabsContent>
+                <TabsContent value="samples">
+                  <SamplesTab />
+                </TabsContent>
+              </div>
+            </ScrollArea>
+            <TooltipContent>
+              <p>{t("You have to select nodes first")}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </Tabs>
+    </div>
   )
 }
 
