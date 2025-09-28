@@ -5,12 +5,12 @@ interface Message {
   content: string;
 }
 
-const LOCAL_STORAGE_KEY = "agentChatMessages"
+const SESSION_STORAGE_KEY = "agentChatMessages"
 
 export default function AgentChat() {
-  // 初始化时尝试从 localStorage 读取
+  // 初始化时尝试从 sessionStorage 读取
   const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY)
+    const saved = sessionStorage.getItem(SESSION_STORAGE_KEY)
     if (saved) return JSON.parse(saved)
     return [
       {
@@ -32,9 +32,9 @@ export default function AgentChat() {
     scrollToBottom()
   }, [messages])
 
-  // 持久化消息到 localStorage
+  // 持久化到 sessionStorage
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(messages))
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(messages))
   }, [messages])
 
   const handleSend = async () => {
@@ -98,9 +98,7 @@ export default function AgentChat() {
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`px-3 py-2 rounded-2xl max-w-xs text-sm ${
